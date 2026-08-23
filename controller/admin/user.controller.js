@@ -23,7 +23,9 @@ module.exports.index = async (req, res) => {
         //End Pagination
 
         const users = await User.find()
-            .select("_id username email status role avatar createdAt");
+            .select("_id username email status role avatar createdAt")
+            .limit(objectPagination.limitItems)
+            .skip((objectPagination.currentPage - 1) * objectPagination.limitItems);
 
         return res.json({
             "success": true,
