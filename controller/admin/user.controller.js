@@ -5,8 +5,19 @@ const pagination = require("../../helpers/pagination");
 // [GET] "admin/user"
 module.exports.index = async (req, res) => {
     try {
+        const find = {};
+        if(req.query.role && req.query.role != "all") find.role = req.query.role;
+        if(req.query.status && req.query.status != "all") find.status = req.query.status;
+        if(req.query.search){
+            console.log(req.query.search);
+            find.username = {
+                $regex: req.query.search,
+                $options: "i"
+            }
+        }
+
         const [totalUser, totalActive, totalBanned, totalOwner] = await Promise.all([
-            User.countDocuments(),
+            User.countDocuments(find),
             User.countDocuments({ "status": "active" }),
             User.countDocuments({ "status": "banned" }),
             User.countDocuments({ "role": "owner" })
@@ -22,7 +33,7 @@ module.exports.index = async (req, res) => {
         objectPagination.totalPage = totalPage
         //End Pagination
 
-        const users = await User.find()
+        const users = await User.find(find)
             .select("_id username email status role avatar createdAt")
             .limit(objectPagination.limitItems)
             .skip((objectPagination.currentPage - 1) * objectPagination.limitItems);
