@@ -45,17 +45,18 @@ module.exports.index = async (req, res) => {
     }
 }
 
-// [PATCH] "/admin/user/banned/:id"
-module.exports.ban = async (req,res) => {
+// [PATCH] "/admin/user/change-status/:status/:id"
+module.exports.changeStatus = async (req,res) => {
     try{
         const id = req.params.id;
-        const result = await User.updateOne({"_id": id},{"status": "banned"});
+        const status = req.params.status;
+        const result = await User.updateOne({"_id": id},{"status": status});
         if(result.matchedCount == 0) return res.json({
             "success": false,
             "message": "Không tìm thấy tài khoản cần cập nhật. Vui lòng thử lại"});
         return res.json({"success": true});
     }catch(ex){
-        console.log("Lỗi tại controller admin.user.ban: "+ex);
+        console.log("Lỗi tại controller admin.user.changestatus: "+ex);
         return res.json({"success": false});
     }
 }
