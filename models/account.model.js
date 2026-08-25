@@ -12,7 +12,8 @@ const accountSchema = mongoose.Schema({
     avatar: String,
     business_lisence: String,
     stk: String,
-    tax_code: String
+    tax_code: String,
+    full_name: String
 },{
     timestamp: true
 })

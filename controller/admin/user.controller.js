@@ -71,3 +71,16 @@ module.exports.changeStatus = async (req,res) => {
         return res.json({"success": false});
     }
 }
+
+// [GET] "/admin/user/detail/:id"
+module.exports.detail = async (req,res) => {
+    try{
+        const id = req.params.id;
+        const detail = await User.findOne({"_id": id});
+
+        return res.json({"success": true,"detail": detail});
+    }catch(ex){
+        console.log("Lỗi tại controller admin.user.detail: "+ex);
+        return res.json({"success": false});
+    }
+}
