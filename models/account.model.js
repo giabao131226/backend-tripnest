@@ -13,7 +13,12 @@ const accountSchema = mongoose.Schema({
     business_lisence: String,
     stk: String,
     tax_code: String,
-    full_name: String
+    full_name: String,
+    gender: String,
+    date_of_birth: Date,
+    id_card_front: String,
+    id_card_back: String,
+    bio: String
 },{
     timestamp: true
 })

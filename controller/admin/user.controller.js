@@ -76,11 +76,28 @@ module.exports.changeStatus = async (req,res) => {
 module.exports.detail = async (req,res) => {
     try{
         const id = req.params.id;
-        const detail = await User.findOne({"_id": id});
+        const detail = await User.findOne({"_id": id})
+            .select("-password");
 
         return res.json({"success": true,"detail": detail});
     }catch(ex){
         console.log("Lỗi tại controller admin.user.detail: "+ex);
+        return res.json({"success": false});
+    }
+}
+
+// [PATCH] "/admin/user/edit/:id"
+module.exports.edit = async (req,res) => {
+    try{
+        const id = req.params.id;
+        console.log(req.body);
+        const result = await User.updateOne({"_id": id},req.body);
+        return res.json({
+            "success": true,
+            "message": "Cập nhật thành công"
+        });
+    }catch(ex){
+        console.log("Lỗi tại controller admin.user.edit: "+ex);
         return res.json({"success": false});
     }
 }
