@@ -110,7 +110,27 @@ module.exports.delete = async (req,res) => {
 module.exports.edit = async (req,res) => {
     try{
         const id = req.params.id;
-        const result = await User.updateOne({"_id": id},req.body);
+        const data = req.body;
+
+        if(!validateHelper.validateName(data.username)){
+            return res.status(400).json({
+                success: false,
+                message: "Tên đăng nhập phải có từ 6-20 ký tự, bao gồm chữ hoa, chữ thường và số, không chứa ký tự đặc biệt hoặc khoảng trắng."
+            });
+        }
+        if(data.email && !validateHelper.validateEmail(data.email)){
+            return res.status(400).json({
+                success: false,
+                message: "Email không hợp lệ. Vui lòng nhập đúng định dạng email, ví dụ: example@gmail.com."
+            });
+        }
+        if(data.phone && !validateHelper.validatePhone(data.phone)){
+            return res.status(400).json({
+                success: false,
+                message: "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam gồm 10 chữ số và bắt đầu bằng 03, 05, 07, 08 hoặc 09."
+            });
+        }
+        const result = await User.updateOne({"_id": id},data);
         return res.json({
             "success": true,
             "message": "Cập nhật thành công"

@@ -11,7 +11,6 @@ cloudinary.config({
     api_secret: process.env.API_SECRET
 });
 
-
 router.get("/", controller.index);
 router.patch("/change-status/:status/:id", controller.changeStatus);
 router.get("/detail/:id", controller.detail);

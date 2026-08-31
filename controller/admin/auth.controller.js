@@ -16,7 +16,6 @@ module.exports.login = async (req, res) => {
             "status": "active",
             "deleted": false
         }).select("-password");
-        console.log(result);
 
         if (!result) return res.json({ "success": false });
 
