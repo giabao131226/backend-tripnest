@@ -18,9 +18,14 @@ const accountSchema = mongoose.Schema({
     date_of_birth: Date,
     id_card_front: String,
     id_card_back: String,
-    bio: String
+    bio: String,
+    deleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: Date
 },{
-    timestamp: true
+    timestamps: true
 })
 
 const Account = mongoose.model("Account",accountSchema,"account")

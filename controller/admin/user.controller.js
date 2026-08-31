@@ -1,15 +1,15 @@
 const User = require("../../models/account.model");
 const pagination = require("../../helpers/pagination");
-
+const validateHelper = require("../../helpers/validate.helper");
+const md5 = require("md5");
 
 // [GET] "admin/user"
 module.exports.index = async (req, res) => {
     try {
-        const find = {};
+        const find = {"deleted": false};
         if(req.query.role && req.query.role != "all") find.role = req.query.role;
         if(req.query.status && req.query.status != "all") find.status = req.query.status;
         if(req.query.search){
-            console.log(req.query.search);
             find.username = {
                 $regex: req.query.search,
                 $options: "i"
@@ -86,11 +86,30 @@ module.exports.detail = async (req,res) => {
     }
 }
 
+// [DELETE] "/admin/user/delete/:id"
+module.exports.delete = async (req,res) => {
+    try{
+        const id = req.params.id;
+        const result = await User.updateOne({
+            "_id": id
+        },{"deleted": true,"deletedAt": Date()});
+        return res.status(200).json({
+            "success": true,
+            "message": `Xoá thành công tài khoản có ID = ${id}`
+        });
+    }catch(ex){
+        console.log("Lỗi tại controller admin.user.delete: "+ex);
+        return res.status(400).json({
+            "success": false,
+            "message": "Có lỗi xảy ra.Vui lòng thử lại!"
+        });
+    }
+}
+
 // [PATCH] "/admin/user/edit/:id"
 module.exports.edit = async (req,res) => {
     try{
         const id = req.params.id;
-        console.log(req.body);
         const result = await User.updateOne({"_id": id},req.body);
         return res.json({
             "success": true,
@@ -98,6 +117,44 @@ module.exports.edit = async (req,res) => {
         });
     }catch(ex){
         console.log("Lỗi tại controller admin.user.edit: "+ex);
+        return res.json({"success": false});
+    }
+}
+
+// [POST] "/admin/user/create"
+module.exports.create = async (req,res) => {
+    try{
+        const data = req.body;
+
+        if(!validateHelper.validateName(data.username)){
+            return res.status(400).json({
+                success: false,
+                message: "Tên đăng nhập phải có từ 6-20 ký tự, bao gồm chữ hoa, chữ thường và số, không chứa ký tự đặc biệt hoặc khoảng trắng."
+            });
+        }
+        if(!validateHelper.validatePassword(data.password)){
+             return res.status(400).json({
+                success: false,
+                message: "Mật khẩu phải có từ 6-20 ký tự, bao gồm ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt (!@#$%^&*)."
+            });
+        }
+        if(data.email && !validateHelper.validateEmail(data.email)){
+            return res.status(400).json({
+                success: false,
+                message: "Email không hợp lệ. Vui lòng nhập đúng định dạng email, ví dụ: example@gmail.com."
+            });
+        }
+        if(data.phone && !validateHelper.validatePhone(data.phone)){
+            return res.status(400).json({
+                success: false,
+                message: "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam gồm 10 chữ số và bắt đầu bằng 03, 05, 07, 08 hoặc 09."
+            });
+        }
+        data.password = md5(data.password);
+        const result = await User.create(data);
+        return res.json({"success": true});
+    }catch(ex){
+        console.log("Lỗi tại controller admin.user.create: "+ex);
         return res.json({"success": false});
     }
 }
