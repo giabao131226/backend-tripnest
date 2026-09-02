@@ -1,8 +1,7 @@
 
-const Amenity = require("../models/amenity.model");
 const slugify = require("slugify");
 
-module.exports = async (str) => {
+module.exports = async (str,model) => {
     let slug = slugify(str,{
         lower: true,
         strict: true,
@@ -11,7 +10,7 @@ module.exports = async (str) => {
     });
     let uniqueSlug = slug;
     let count = 1;
-    while (await Amenity.findOne({ slug: uniqueSlug })) {
+    while (await model.findOne({ slug: uniqueSlug })) {
         uniqueSlug = `${slug}-${count}`;
         count++;
     }

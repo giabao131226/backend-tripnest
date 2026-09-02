@@ -44,7 +44,7 @@ module.exports.store = async (req,res) => {
         if(!ownerId) return res.json({"success": false});
         req.body.ownerId = ownerId._id;
         req.body.status = "pending";
-        req.body.slug = await generateSlug(req.body.name+"");
+        req.body.slug = await generateSlug(req.body.name+"",BDS);
         if(req.body.amenity.length > 0) req.body.amenityIds = JSON.parse(req.body.amenity);
 
         const result = await BDS.create(req.body);
@@ -63,7 +63,7 @@ module.exports.update = async (req,res) => {
         if(!ownerId) return res.json({"success": false});
         req.body.ownerId = ownerId._id;
         req.body.status = "pending";
-        req.body.slug = await generateSlug(req.body.name+"");
+        req.body.slug = await generateSlug(req.body.name+"",BDS);
         if(req.body.oldImages){
             const oldImages = JSON.parse(req.body.oldImages);
             if(req.body.images){
