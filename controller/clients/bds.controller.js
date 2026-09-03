@@ -5,6 +5,7 @@ const formatHelper = require("../../helpers/format.helper");
 const generateSlug = require("../../helpers/generateSlug");
 const { raw } = require("express");
 const Amenity = require("../../models/amenity.model");
+const AccommodationUnit = require("../../models/accommodationUnit.model");
 
 // [GET] "/bds"
 module.exports.index = async (req,res) => {
@@ -48,10 +49,22 @@ module.exports.store = async (req,res) => {
         if(req.body.amenity.length > 0) req.body.amenityIds = JSON.parse(req.body.amenity);
 
         const result = await BDS.create(req.body);
-        return res.json({"success": true});
+        if(req.body.rooms){
+            const rooms = JSON.parse(req.body.rooms);
+            await Promise.all(rooms.map(async (room) => {
+                room.accommodationId = result._id;
+                await AccommodationUnit.create(room);
+            }));
+        }
+        return res.json({
+            "success": true
+        });
     }catch(ex){
         console.log("Có lỗi xảy ra khi lưu trữ thông tin bất động sản: "+ex);
-        return res.json({"success": false});
+        return res.json({
+            "success": false,
+            "message": ex
+        });
     }
 }
 // [POST] "/bds/update/:slug"

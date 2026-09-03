@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const accommodationUnitSchema = mongoose.Schema({
+    accommodation_id: String,
     title: String,
     description: String,
     room_size: Number,

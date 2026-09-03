@@ -36,7 +36,10 @@ router.post("/save",
             }
         }catch(ex){
             console.log("Có lỗi xảy ra khi lưu ảnh : "+ex);
-            return res.json({"success" : false});
+            return res.json({
+                "success" : false,
+                "message": "Có lỗi xảy ra trong quá trình lưu ảnh"
+            });
         }
         next();
     },controller.store);
