@@ -3,6 +3,8 @@ const Images = require("../../models/images.model");
 const Amenity = require("../../models/amenity.model");
 const formatHelper = require("../../helpers/format.helper");
 const pagination = require("../../helpers/pagination");
+const Province = require("../../models/province.model");
+const Ward = require("../../models/ward.model");
 
 // [GET] "/admin/accommodations"
 module.exports.index = async (req, res) => {
@@ -51,21 +53,58 @@ module.exports.approve = async (req, res) => {
 // [GET] "/admin/accommodations/all"
 module.exports.all = async (req, res) => {
     try {
+        const find = {};
+        const search = req.query.search;
+        if(search){
+            find["$or"] = [];
+            find["$or"].push({
+                name: {$regex: search,$options: "i"}
+            });
+            const [provinces,wards] = await Promise.all([
+                Province.find({
+                    "name": {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }),
+                Ward.find({
+                    "name": {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }),
+            ])
+            if(provinces.length > 0){
+                const idProvinces = provinces.map((item) => item._id);
+                find["$or"].push({
+                    "province_id": {$in: idProvinces}
+                });
+            }
+            if(wards.length > 0){
+                const idWards = wards.map((item) => item._id);
+                find["$or"].push({
+                    "ward_id": {$in: idWards}
+                });
+            }
+        }
+
         // Pagination
         let objectPagination = {
             currentPage: 1,
             limitItems: 4
         }
         pagination(req.query, objectPagination)
-        const countProduct = await BDS.countDocuments({});
+        const countProduct = await BDS.countDocuments(find);
         const totalPage = Math.ceil(countProduct / objectPagination.limitItems)
         objectPagination.totalPage = totalPage
         //End Pagination
-        const accommodations = await BDS.find()
+        const accommodations = await BDS.find(find)
             .limit(objectPagination.limitItems)
-            .skip((objectPagination.currentPage - 1) * 4)
-            .select("name ownerId status")
-            .populate("ownerId", "username");
+            .skip((objectPagination.currentPage - 1) * objectPagination.limitItems)
+            .select("name ownerId category_id status")
+            .populate("ownerId", "username")
+            .populate("category_id");
+        
         return res.json({ 
             "success": true, 
             "accommodations": accommodations,

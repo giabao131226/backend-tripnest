@@ -4,7 +4,7 @@ const bdsSchema = mongoose.Schema({
     price: Number,
     category_id: {
         type: mongoose.Schema.ObjectId,
-        ref: "Categories"
+        ref: "Category"
     },
     rate: Number,
     ownerId: {
