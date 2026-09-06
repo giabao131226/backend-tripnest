@@ -88,6 +88,10 @@ module.exports.all = async (req, res) => {
             }
         }
 
+        const category = req.query.category;
+        if(category && category != "all"){
+            find["category_id"] = category;
+        }
         // Pagination
         let objectPagination = {
             currentPage: 1,
