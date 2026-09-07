@@ -39,6 +39,7 @@ module.exports.signUp = async (req,res) => {
                             "email": payload.email,
                             "phone": payload.phone
                         },"chiakhoabimat",{expiresIn: "24h"});
+
     payload.tokenUser = tokenUser;
     const account = await Account.create(payload);
     return res.json({

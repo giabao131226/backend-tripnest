@@ -5,6 +5,7 @@ const bdsRouter = require("./bds.route.js");
 const provinceRouter = require("./province.route.js");
 const amenityRouter = require("./amenity.route.js");
 const categoryRouter = require("./categories.route.js");
+const hostRouter = require("./host/index.route.js");
 
 module.exports = (app) => {
     app.use("/",homeRouter);
@@ -13,4 +14,5 @@ module.exports = (app) => {
     app.use("/province",provinceRouter);
     app.use("/amenity",amenityRouter);
     app.use("/categories",categoryRouter);
+    app.use("/host",hostRouter);
 }
