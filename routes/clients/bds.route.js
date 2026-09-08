@@ -45,8 +45,8 @@ router.post("/save",
     },controller.store);
 router.patch("/delete/:id",controller.deleteProperty)
 router.get("/my-property",controller.myProperty)
-router.get("/edit/:slug",controller.edit);
-router.post("/update/:slug",upload.fields([
+router.get("/edit/:id",controller.edit);
+router.post("/update/:id",upload.fields([
     { name: "lisence", maxCount: 1 },
     { name: "images", maxCount: 20 }
     ]),

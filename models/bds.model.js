@@ -36,7 +36,8 @@ const bdsSchema = mongoose.Schema({
         default: null,
         ref: "Ward"
     },
-    address: String
+    address: String,
+    slug: String
 },{
     timestamps: true
 });

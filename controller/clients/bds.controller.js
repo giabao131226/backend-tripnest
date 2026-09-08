@@ -26,14 +26,21 @@ module.exports.index = async (req,res) => {
 module.exports.detail = async (req,res) => {
     try{
         const id = req.params.id;
-        const data = await BDS.findOne({"_id": id,status: "active","deleted": false}).lean();
-        const images = await Images.find({"bdsID": data._id}).lean();
-        data.images = images;
-        data.price = formatHelper.formatVNDMoney(data.price);
-        return res.json({"success": true,"data": data});
+        const data = await BDS.findOne({"_id": id})
+            .populate("category_id")
+            .populate("amenityIds")
+            .populate("province_id")
+            .populate("ward_id").lean();
+        if(data.price) data.price = formatHelper.formatVNDMoney(data.price);
+        return res.json({
+            "success": true,
+            "detail": data});
     }catch(ex){
         console.log("Có lỗi xảy ra khi lấy thông tin chi tiết bất động sản: "+ex);
-        return res.json({"success": false});
+        return res.json({
+            "success": false,
+            "message": ex
+        });
     }
 }
 
@@ -67,10 +74,10 @@ module.exports.store = async (req,res) => {
         });
     }
 }
-// [POST] "/bds/update/:slug"
+// [POST] "/bds/update/:id"
 module.exports.update = async (req,res) => {
     try{
-        const slug = req.params.slug;
+        const id = req.params.id;
         const tokenUser = req.cookies.tokenUser;
         const ownerId = await Account.findOne({"tokenUser": tokenUser}).select("_id");
         if(!ownerId) return res.json({"success": false});
@@ -87,7 +94,7 @@ module.exports.update = async (req,res) => {
         }
         if(req.body.amenity.length > 0) req.body.amenityIds = JSON.parse(req.body.amenity);
 
-        const result = await BDS.updateOne({"slug": slug},{...req.body});
+        const result = await BDS.updateOne({"_id": id},{...req.body});
         return res.json({"success": true});
     }catch(ex){
         console.log("Có lỗi xảy ra khi cập nhật thông tin bất động sản: "+ex);
@@ -135,11 +142,11 @@ module.exports.deleteProperty = async (req,res) => {
     }
 }
 
-// [GET] "/bds/edit/:slug"
+// [GET] "/bds/edit/:id"
 module.exports.edit = async (req,res) => {
     try{
-        const slug = req.params.slug;
-        const accommodationDetail = await BDS.findOne({"slug": slug});
+        const id = req.params.id;
+        const accommodationDetail = await BDS.findOne({"_id": id});
         return res.json({
             "success": true,
             "accommodationDetail": accommodationDetail
@@ -148,6 +155,8 @@ module.exports.edit = async (req,res) => {
     }catch(ex){
         console.log("Có lỗi xảy ra trong quá trình lấy thông tin cơ sở lưu trú: "+ex);
         return res.json({
-            "success": false})
+            "success": false,
+            "message": ex
+        })
     }
 }
