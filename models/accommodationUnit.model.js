@@ -17,6 +17,7 @@ const accommodationUnitSchema = mongoose.Schema({
     status: String,
     deleted_at: Date,
     total_room: Number,
+    images: Array,
     deleted: {
         type: Boolean,
         default: false

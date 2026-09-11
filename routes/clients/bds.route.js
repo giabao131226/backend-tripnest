@@ -18,7 +18,8 @@ router.get("/detail/:id",controller.detail);
 router.post("/save",
     upload.fields([
     { name: "lisence", maxCount: 1 },
-    { name: "images", maxCount: 20 }
+    { name: "images", maxCount: 20 },
+    {name: "roomImages"}
     ]),
     async (req,res,next) => {
         try{
@@ -33,6 +34,14 @@ router.post("/save",
                         return result.secure_url;
                     })
                 );
+            }if(req.files.roomImages){
+                req.body.roomImages = await Promise.all(
+                    req.files.roomImages.map(async (file) => {
+                        const result = await cloudinary.uploader.upload(file.path);
+                        return result.secure_url;
+                    })
+                );
+                console.log(req.body.roomImages);
             }
         }catch(ex){
             console.log("Có lỗi xảy ra khi lưu ảnh : "+ex);

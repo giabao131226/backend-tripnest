@@ -7,7 +7,7 @@ module.exports.formatVNDMoney = (money) => {
         x = money % 10;
         array.push(x);
         cnt++;
-        if(cnt%3==0){
+        if(cnt%3==0 && parseInt(money/10) != 0){
             array.push(",");
         }
         money = parseInt(money/10);        

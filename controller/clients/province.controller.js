@@ -18,3 +18,20 @@ module.exports.index = async (req,res) => {
         return res.json({"success": false});
     }
 }
+
+// [GET] "/province-only"
+module.exports.provinceOnly = async (req,res) => {
+    try{
+        const provinces = await Province.find({
+            "status": "active"
+        }).lean();
+    
+        return res.json({"success": true,"data": provinces});
+    }catch(ex){
+        console.log("Có lỗi xảy ra khi lấy dữ liệu tỉnh/thành phố: "+ex);
+        return res.json({
+            "success": false,
+            "message": "Có lỗi xảy ra. Không thể lấy được tên thành phố"
+        });
+    }
+}
