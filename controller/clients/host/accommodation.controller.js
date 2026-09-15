@@ -7,7 +7,10 @@ const Ward = require("../../../models/ward.model");
 module.exports.index = async (req,res) => {
     try {
         const user = req.user;
-        const find = {'ownerId': user._id};
+        const find = {
+            'ownerId': user._id,
+            'deleted': false
+        };
         const search = req.query.search;
         if (search) {
             find["$or"] = [];
@@ -65,11 +68,11 @@ module.exports.index = async (req,res) => {
                 .select("name ownerId category_id status")
                 .populate("ownerId", "username")
                 .populate("category_id"),
-            await BDS.countDocuments({"ownerId": user._id}),
-            await BDS.countDocuments({"ownerId": user._id,"status": "active"}),
-            await BDS.countDocuments({"ownerId": user._id,"status": "in-active"}),
-            await BDS.countDocuments({"ownerId": user._id,"status": "pending"}),
-            await BDS.countDocuments({"ownerId": user._id,"status": "denided"})
+            await BDS.countDocuments({"ownerId": user._id,"deleted": false}),
+            await BDS.countDocuments({"ownerId": user._id,"status": "active","deleted": false}),
+            await BDS.countDocuments({"ownerId": user._id,"status": "in-active","deleted": false}),
+            await BDS.countDocuments({"ownerId": user._id,"status": "pending","deleted": false}),
+            await BDS.countDocuments({"ownerId": user._id,"status": "denided","deleted": false})
         ]);
 
         return res.json({
@@ -88,5 +91,24 @@ module.exports.index = async (req,res) => {
     } catch (ex) {
         console.log("Lỗi xảy ra ở controller admin.accommodation.all: " + ex);
         return res.json({ "success": false });
+    }
+}
+
+// [DELETE] "host/accommodation/delete/:id"
+module.exports.delete = async (req,res) => {
+    try{
+        const id = req.params.id;
+        const result = await BDS.updateOne({"_id": id},{"deleted": true,"deletedAt": new Date()});
+
+        return res.json({
+            "success": true,
+            "message": `Xoá thành công cơ sở lưu trú có ID là ${id}`
+        })
+    }catch(ex){
+        console.log("Có lỗi xảy ra tại controller host.accommodation.delete: "+ex);
+        return res.json({
+            "success": false,
+            "message": "Có lỗi xảy ra. Vui lòng thử lại!!"
+        });
     }
 }

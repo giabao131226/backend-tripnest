@@ -25,6 +25,9 @@ const bdsSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
+    deletedAt: {
+        type: Date
+    },
     slug: String,
     province_id: {
         type: mongoose.Schema.ObjectId,
