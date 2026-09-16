@@ -5,5 +5,4 @@ const controller = require("../../../controller/clients/host/accommodation.contr
 router.get("/all",controller.index);
 router.delete("/delete/:id",controller.delete);
 
-
 module.exports = router;
