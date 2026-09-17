@@ -1,7 +1,7 @@
 const Category = require("../../models/categories.model");
 const BDS = require("../../models/bds.model");
 const pagination = require("../../helpers/pagination");
-
+const generateSlug = require("../../helpers/generateSlug");
 
 // [GET] "/categories"
 module.exports.index = async (req, res) => {
@@ -71,5 +71,31 @@ module.exports.all = async (req, res) => {
     } catch (ex) {
         console.log("Có lỗi tại controller categories.all: " + ex);
         return res.status(400).json({ "success": false, "message": "Có lỗi xảy ra!" });
+    }
+}
+
+// [POST] "/categories/create"
+module.exports.create = async (req,res) => {
+    try{
+        const data = req.body;
+        if(!data.title.trim()){
+            return res.status(400).json({
+                "success": false,
+                "message": "Vui lòng nhập tên danh mục"
+            });
+        }
+
+        data.slug = await generateSlug(data.title,Category);
+        const result = await Category.create(data);
+        return res.status(200).json({
+            "success": true,
+            "message": "Thêm mới danh mục thành công"
+        });
+    }catch(ex){
+        console.log("Có lỗi xảy ra tại controller categories.create: "+ex);
+        return res.json({
+            "success": false,
+            "message": "Có lỗi xảy ra"
+        })
     }
 }
