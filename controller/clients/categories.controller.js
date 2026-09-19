@@ -122,3 +122,60 @@ module.exports.delete = async (req,res) => {
         })
     }
 }
+
+// [GET] "/categories/detail/:slug"
+module.exports.detail = async (req,res) => {
+    try {
+        const slug = req.params.slug;
+        const detail = await Category.findOne({
+            "slug": slug,
+            "deleted": false
+        }).lean();
+        const quantityAccLinkTo = await BDS.countDocuments({
+            "category_id": detail._id
+        });
+        detail.quantityAccLinkTo = quantityAccLinkTo;
+        return res.status(200).json({
+            "success": true,
+            "detail": detail
+        });
+    } catch (ex) {
+        console.log("Có lỗi tại controller categories.detail: " + ex);
+        return req.status(400).json({ 
+            "success": false, 
+            "message": "Có lỗi xảy ra!" 
+        });
+    }
+}
+
+// [PATCH] "/categories/edit/:id"
+module.exports.edit = async (req,res) => {
+    try{
+        const id = req.params.id;
+        const data = req.body;
+        if(!data.title.trim()){
+            return res.status(400).json({
+                "success": false,
+                "message": "Vui lòng nhập tên danh mục"
+            });
+        }
+
+        data.slug = await generateSlug(data.title,Category);
+        const result = await Category.updateOne({"_id": id},data);
+        const newDetail = await Category.findOne({
+            "_id": id,
+            "deleted": false
+        });
+        return res.status(200).json({
+            "success": true,
+            "message": `Cập nhật thành công danh mục có ID là: ${id}`,
+            "newDetail": newDetail
+        });
+    }catch(ex){
+        console.log("Có lỗi xảy ra tại controller categories.edit: "+ex);
+        return res.status(400).json({
+            "success": false,
+            "message": "Có lỗi xảy ra"
+        })
+    }
+}
