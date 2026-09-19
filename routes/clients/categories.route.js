@@ -5,5 +5,6 @@ const controller = require("../../controller/clients/categories.controller");
 router.get("/",controller.index);
 router.get("/all",controller.all);
 router.post("/create",controller.create);
+router.delete("/delete/:id",controller.delete);
 
 module.exports = router;

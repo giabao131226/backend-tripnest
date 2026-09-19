@@ -21,7 +21,9 @@ module.exports.index = async (req, res) => {
 module.exports.all = async (req, res) => {
     try {
         const { status, search } = req.query;
-        const find = {};
+        const find = {
+            "deleted": false
+        };
         if (status === 'active' || status === 'inactive') find.status = status;
         if (search != '') {
             find.title = {
@@ -93,7 +95,28 @@ module.exports.create = async (req,res) => {
         });
     }catch(ex){
         console.log("Có lỗi xảy ra tại controller categories.create: "+ex);
-        return res.json({
+        return res.status(400).json({
+            "success": false,
+            "message": "Có lỗi xảy ra"
+        })
+    }
+}
+
+// [DELETE] "/categories/delete/:id"
+module.exports.delete = async (req,res) => {
+    try{
+        const id = req.params.id;
+        const result = await Category.updateOne({
+            "deleted": true,
+            "deletedAt": new Date()
+        });
+        return res.status(200).json({
+            "success": true,
+            "message": `Xoá thành công danh mục có ID là ${id}`
+        });
+    }catch(ex){
+        console.log("Có lỗi xảy ra tại controller categories.delete: "+ex);
+        return res.status(400).json({
             "success": false,
             "message": "Có lỗi xảy ra"
         })
