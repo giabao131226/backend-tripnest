@@ -25,11 +25,26 @@ module.exports.provinceOnly = async (req,res) => {
         const provinces = await Province.find({
             "status": "active"
         }).lean();
+
+        const data = provinces.map((province) => {
+            return {
+                "value": province._id.toString(),
+                "label": province.name
+            }
+        });
+
+        data.unshift({
+            "value": "all",
+            "label": "Tất cả"
+        });
     
-        return res.json({"success": true,"data": provinces});
+        return res.status(200).json({
+            "success": true,
+            "data": data
+        });
     }catch(ex){
         console.log("Có lỗi xảy ra khi lấy dữ liệu tỉnh/thành phố: "+ex);
-        return res.json({
+        return res.status(400).json({
             "success": false,
             "message": "Có lỗi xảy ra. Không thể lấy được tên thành phố"
         });

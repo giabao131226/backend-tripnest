@@ -2,6 +2,7 @@
 module.exports.formatVNDMoney = (money) => {
     const array = [];
     money = parseInt(money);
+    if (!money || Number.isNaN(money)) return "0";
     cnt = 0;
     while(money != 0){
         x = money % 10;

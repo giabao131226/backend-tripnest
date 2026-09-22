@@ -25,7 +25,7 @@ module.exports.all = async (req, res) => {
             "deleted": false
         };
         if (status === 'active' || status === 'inactive') find.status = status;
-        if (search != '') {
+        if (search && search != '') {
             find.title = {
                 $regex: search,
                 "$options": "i"
@@ -173,6 +173,27 @@ module.exports.edit = async (req,res) => {
         });
     }catch(ex){
         console.log("Có lỗi xảy ra tại controller categories.edit: "+ex);
+        return res.status(400).json({
+            "success": false,
+            "message": "Có lỗi xảy ra"
+        })
+    }
+}
+
+// [PATCH] "/categories/change-status/:status/:id"
+module.exports.changeStatus = async (req,res) => {
+    try{
+        const id = req.params.id;
+        const status = req.params.status;
+
+        const result = await Category.updateOne({"_id": id},{"status": status});
+       
+        return res.status(200).json({
+            "success": true,
+            "message": `Chuyển trạng thái thành công`
+        });
+    }catch(ex){
+        console.log("Có lỗi xảy ra tại controller categories.changeStatus: "+ex);
         return res.status(400).json({
             "success": false,
             "message": "Có lỗi xảy ra"

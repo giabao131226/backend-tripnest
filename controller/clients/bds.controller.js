@@ -1,6 +1,5 @@
 const BDS = require("../../models/bds.model");
 const Account = require("../../models/account.model");
-const Images = require("../../models/images.model");
 const formatHelper = require("../../helpers/format.helper");
 const generateSlug = require("../../helpers/generateSlug");
 const Amenity = require("../../models/amenity.model");
@@ -10,7 +9,6 @@ const pagination = require("../../helpers/pagination");
 // [GET] "/bds"
 module.exports.index = async (req, res) => {
     try {
-
         const find = {
             "status": "active",
             "deleted": false
@@ -54,6 +52,11 @@ module.exports.index = async (req, res) => {
             find["category_id"] = category;
         }
 
+        const provinceId = req.query.provinceId;
+        if (provinceId && provinceId != "all") {
+            find["province_id"] = provinceId;
+        }
+
         // Pagination
         let objectPagination = {
             currentPage: 1,
@@ -72,11 +75,23 @@ module.exports.index = async (req, res) => {
             .populate("category_id")
             .populate("amenityIds")
             .lean();
+        console.log(bds);
 
-        finalData = bds.map((item) => {
-            if (item.price) item.price = formatHelper.formatVNDMoney(item.price);
-            return { ...item }
-        })
+        finalData = await Promise.all(bds.map(async (item) => {
+            const unitAccs = await AccommodationUnit.find({
+                "accommodation_id": item._id,
+                "deleted": false
+            });
+            if(unitAccs.length > 0 ){
+                console.log(unitAccs);
+                let minPrice = unitAccs[0].price_per_night;
+                unitAccs.forEach((unit) => {
+                    if(unit.price_per_night && unit.price_per_night < minPrice) minPrice = unit.price_per_night;
+                });
+                if(minPrice) item.price = formatHelper.formatVNDMoney(minPrice);
+            }
+            return { ...item };
+        }));
 
         return res.json({
             "success": true,
