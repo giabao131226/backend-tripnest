@@ -14,5 +14,6 @@ module.exports = (app) => {
     app.use("/province",provinceRouter);
     app.use("/amenity",amenityRouter);
     app.use("/categories",categoryRouter);
+    app.use("/amenities",amenityRouter)
     app.use("/host",hostRouter);
 }
