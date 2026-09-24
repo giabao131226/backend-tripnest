@@ -100,13 +100,13 @@ module.exports.create = async (req,res) => {
 module.exports.delete = async (req,res) => {
     try{
         const id = req.params.id;
-        const result = await Amenity.updateOne({
+        const result = await Amenity.updateOne({"_id": id},{
             "deleted": true,
             "deletedAt": new Date()
         });
         return res.status(200).json({
             "success": true,
-            "message": `Xoá thành công danh mục có ID là ${id}`
+            "message": `Xoá thành công tiện ích có ID là ${id}`
         });
     }catch(ex){
         console.log("Có lỗi xảy ra tại controller amenities.delete: "+ex);
@@ -120,15 +120,11 @@ module.exports.delete = async (req,res) => {
 // [GET] "/amenities/detail/:slug"
 module.exports.detail = async (req,res) => {
     try {
-        const slug = req.params.slug;
+        const id = req.params.id;
         const detail = await Amenity.findOne({
-            "slug": slug,
+            "_id": id,
             "deleted": false
         }).lean();
-        const quantityAccLinkTo = await BDS.countDocuments({
-            "Amenity_id": detail._id
-        });
-        detail.quantityAccLinkTo = quantityAccLinkTo;
         return res.status(200).json({
             "success": true,
             "detail": detail
@@ -147,14 +143,14 @@ module.exports.edit = async (req,res) => {
     try{
         const id = req.params.id;
         const data = req.body;
-        if(!data.title.trim()){
+        if(!data.name.trim()){
             return res.status(400).json({
                 "success": false,
-                "message": "Vui lòng nhập tên danh mục"
+                "message": "Vui lòng nhập tên tiện ích"
             });
         }
 
-        data.slug = await generateSlug(data.title,Amenity);
+        data.slug = await generateSlug(data.name,Amenity);
         const result = await Amenity.updateOne({"_id": id},data);
         const newDetail = await Amenity.findOne({
             "_id": id,
@@ -162,7 +158,7 @@ module.exports.edit = async (req,res) => {
         });
         return res.status(200).json({
             "success": true,
-            "message": `Cập nhật thành công danh mục có ID là: ${id}`,
+            "message": `Cập nhật thành công tiện ích có ID là: ${id}`,
             "newDetail": newDetail
         });
     }catch(ex){
