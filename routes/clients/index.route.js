@@ -6,6 +6,7 @@ const provinceRouter = require("./province.route.js");
 const amenityRouter = require("./amenity.route.js");
 const categoryRouter = require("./categories.route.js");
 const hostRouter = require("./host/index.route.js");
+const accommodationUnitRouter = require("./accommodation-unit.route.js");
 
 module.exports = (app) => {
     app.use("/",homeRouter);
@@ -16,4 +17,5 @@ module.exports = (app) => {
     app.use("/categories",categoryRouter);
     app.use("/amenities",amenityRouter)
     app.use("/host",hostRouter);
+    app.use("/accommodation-unit",accommodationUnitRouter);
 }

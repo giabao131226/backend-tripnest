@@ -14,7 +14,10 @@ const accommodationUnitSchema = mongoose.Schema({
     bathrooms_count: Number,
     total_inventory: Number,
     rating: Number,
-    status: String,
+    status: {
+        type: String,
+        default: "active"
+    },
     deleted_at: Date,
     total_room: Number,
     images: Array,

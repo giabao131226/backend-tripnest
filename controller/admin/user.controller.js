@@ -56,6 +56,48 @@ module.exports.index = async (req, res) => {
     }
 }
 
+// [GET] "/admin/user/all"
+module.exports.all = async (req,res) => {
+     try {
+        const find = {"deleted": false};
+        if(req.query.role && req.query.role != "all") find.role = req.query.role;
+        if(req.query.status && req.query.status != "all") find.status = req.query.status;
+        if(req.query.search){
+            find.username = {
+                $regex: req.query.search,
+                $options: "i"
+            }
+        }
+
+         const totalUser = await User.countDocuments(find);
+
+        // Pagination
+        let objectPagination = {
+            currentPage: 1,
+            limitItems: 10
+        }
+        pagination(req.query, objectPagination)
+        const totalPage = Math.ceil(totalUser / objectPagination.limitItems)
+        objectPagination.totalPage = totalPage
+        //End Pagination
+
+        const users = await User.find(find)
+            .select("_id username avatar")
+            .limit(objectPagination.limitItems)
+            .skip((objectPagination.currentPage - 1) * objectPagination.limitItems);
+        return res.status(200).json({
+            "success": true,
+            "users": users,
+            "currentPage": objectPagination.currentPage,
+            "totalPage": objectPagination.totalPage,
+        });
+    } catch (ex) {
+        console.log("Lỗi tại controller admin.user.all: " + ex);
+        return res.json({ "success": false,"message": "Có lỗi xảy ra" });
+    }
+}
+
+
 // [PATCH] "/admin/user/change-status/:status/:id"
 module.exports.changeStatus = async (req,res) => {
     try{
