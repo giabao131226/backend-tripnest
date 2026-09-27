@@ -93,15 +93,14 @@ module.exports.changeStatus = async (req,res) => {
     }
 }
 
-// [GET] "/vouchers/detail/:code"
+// [GET] "/vouchers/detail/:id"
 module.exports.detail = async (req,res) => {
     try {
-        const code = req.params.code;
+        const id = req.params.id;
         const detail = await Voucher.findOne({
-            "code": code
+            "_id": id
         }).lean();
 
-        console.log(detail);
         return res.status(200).json({
             "success": true,
             "detail": detail
@@ -113,4 +112,28 @@ module.exports.detail = async (req,res) => {
             "message": "Có lỗi xảy ra!" 
         });
     }
+}
+
+// [PUT] "/vouchers/edit/:code"
+module.exports.edit = async (req,res) => {
+    try{
+            const id = req.params.id;
+            const data = req.body;
+           
+            const result = await Voucher.updateOne({"_id": id},data);
+            const newDetail = await Voucher.findOne({
+                "_id": id
+            });
+            return res.status(200).json({
+                "success": true,
+                "message": `Cập nhật thành công Voucher có ID là: ${id}`,
+                "newDetail": newDetail
+            });
+        }catch(ex){
+            console.log("Có lỗi xảy ra tại controller vouchers.edit: "+ex);
+            return res.status(400).json({
+                "success": false,
+                "message": "Có lỗi xảy ra"
+            })
+        }
 }
