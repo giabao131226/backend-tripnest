@@ -16,7 +16,6 @@ module.exports.index = async (req,res) => {
                 code: { $regex: search, $options: "i" }
             })
         }
-        console.log(find);
         // Pagination
         let objectPagination = {
             currentPage: 1,
@@ -58,6 +57,7 @@ module.exports.index = async (req,res) => {
 module.exports.create = async (req,res) => {
     try{
         const data = req.body;
+        console.log(data);
         const result = await Voucher.create(data);
         return res.status(200).json({
             "success": "true",
@@ -69,5 +69,48 @@ module.exports.create = async (req,res) => {
             "success": false,
             "message": "Có lỗi xảy ra"
         })
+    }
+}
+
+// [PATCH] "/vouchers/change-status/:status/:id"
+module.exports.changeStatus = async (req,res) => {
+    try{
+        const id = req.params.id;
+        const status = req.params.status;
+
+        const result = await Voucher.updateOne({"_id": id},{"status": status});
+       
+        return res.status(200).json({
+            "success": true,
+            "message": `Chuyển trạng thái thành công`
+        });
+    }catch(ex){
+        console.log("Có lỗi xảy ra tại controller vouchers.changeStatus: "+ex);
+        return res.status(400).json({
+            "success": false,
+            "message": "Có lỗi xảy ra"
+        })
+    }
+}
+
+// [GET] "/vouchers/detail/:code"
+module.exports.detail = async (req,res) => {
+    try {
+        const code = req.params.code;
+        const detail = await Voucher.findOne({
+            "code": code
+        }).lean();
+
+        console.log(detail);
+        return res.status(200).json({
+            "success": true,
+            "detail": detail
+        });
+    } catch (ex) {
+        console.log("Có lỗi tại controller vouchers.detail: " + ex);
+        return res.status(400).json({ 
+            "success": false, 
+            "message": "Có lỗi xảy ra!" 
+        });
     }
 }

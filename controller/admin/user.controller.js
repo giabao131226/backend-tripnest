@@ -60,8 +60,6 @@ module.exports.index = async (req, res) => {
 module.exports.all = async (req,res) => {
      try {
         const find = {"deleted": false};
-        if(req.query.role && req.query.role != "all") find.role = req.query.role;
-        if(req.query.status && req.query.status != "all") find.status = req.query.status;
         if(req.query.search){
             find.username = {
                 $regex: req.query.search,
@@ -69,7 +67,7 @@ module.exports.all = async (req,res) => {
             }
         }
 
-         const totalUser = await User.countDocuments(find);
+        const totalUser = await User.countDocuments(find);
 
         // Pagination
         let objectPagination = {
@@ -82,7 +80,7 @@ module.exports.all = async (req,res) => {
         //End Pagination
 
         const users = await User.find(find)
-            .select("_id username avatar")
+            .select("_id username avatar email")
             .limit(objectPagination.limitItems)
             .skip((objectPagination.currentPage - 1) * objectPagination.limitItems);
         return res.status(200).json({
