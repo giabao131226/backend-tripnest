@@ -69,6 +69,11 @@ const voucherSchema = new mongoose.Schema({
         type: String,
         enum: ["active", "inactive"],
         default: "active"
+    },
+    category_ids: {
+        type: Array,
+        default: [],
+        required: true
     }
 },{timestamps: true});
 

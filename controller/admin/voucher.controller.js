@@ -33,7 +33,7 @@ module.exports.index = async (req,res) => {
                 .skip((objectPagination.currentPage - 1) * objectPagination.limitItems),
             await Voucher.countDocuments(),
             await Voucher.countDocuments({"status": "active"}),
-            await Voucher.countDocuments({"status": "in-active"}),
+            await Voucher.countDocuments({"status": "inactive"}),
         ]);
 
         return res.json({

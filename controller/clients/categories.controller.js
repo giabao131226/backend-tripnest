@@ -6,7 +6,11 @@ const generateSlug = require("../../helpers/generateSlug");
 // [GET] "/categories"
 module.exports.index = async (req, res) => {
     try {
-        const categories = await Category.find({});
+        const categories = await Category.find({
+            "deleted": false,
+            "status": "active"
+        });
+        
         return res.status(200).json({
             "success": true,
             "categories": categories
