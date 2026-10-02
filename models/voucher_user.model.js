@@ -19,5 +19,6 @@ const voucherUserSchema = new mongoose.Schema(
         timestamps: true
     }
 );
+const VoucherUser = mongoose.model("VoucherUser", voucherUserSchema,"Vouchers_Users")
 
-module.exports = mongoose.model("VoucherUser", voucherUserSchema);
+module.exports = VoucherUser;
