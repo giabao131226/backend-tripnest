@@ -75,7 +75,6 @@ module.exports.index = async (req, res) => {
             .populate("category_id")
             .populate("amenityIds")
             .lean();
-        console.log(bds);
 
         finalData = await Promise.all(bds.map(async (item) => {
             const unitAccs = await AccommodationUnit.find({
