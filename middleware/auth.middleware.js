@@ -20,13 +20,17 @@ module.exports.authAdmin = async (req,res,next) => {
 module.exports.auth = async (req,res,next) => {
      try{
         const token = req.cookies.tokenUser;
-        const user = await Account.findOne({"tokenUser": token,"deleted": false,"status": "active"});
+        const user = await Account.findOne({
+            "tokenUser": token,
+            "deleted": false,
+            "status": "active"
+        });
         if(!user) throw new Error();
         req.user = user;
         next();
     }catch(ex){
         console.log("Có lỗi tại middleware authenticate.auth: "+ex);
-        return res.status("401").json({
+        return res.status(401).json({
             "success": false,
             "message": "Unthorization"
         })

@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require("../../controller/clients/categories.controller");
 const authMiddleware = require("../../middleware/auth.middleware");
 
-router.use(authMiddleware.authAdmin);
+router.use(authMiddleware.auth);
 router.get("/",controller.index);
 router.get("/all",controller.all);
 router.post("/create",controller.create);
