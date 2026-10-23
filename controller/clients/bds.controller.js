@@ -48,6 +48,7 @@ module.exports.index = async (req, res) => {
         }
 
         const category = req.query.category;
+        console.log(category);
         if (category && category != "all") {
             find["category_id"] = category;
         }
@@ -82,7 +83,6 @@ module.exports.index = async (req, res) => {
                 "deleted": false
             });
             if(unitAccs.length > 0 ){
-                console.log(unitAccs);
                 let minPrice = unitAccs[0].price_per_night;
                 unitAccs.forEach((unit) => {
                     if(unit.price_per_night && unit.price_per_night < minPrice) minPrice = unit.price_per_night;

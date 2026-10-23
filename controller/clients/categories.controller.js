@@ -17,7 +17,10 @@ module.exports.index = async (req, res) => {
         });
     } catch (ex) {
         console.log("Có lỗi tại controller categories.index: " + ex);
-        return req.status(400).json({ "success": false, "message": "Có lỗi xảy ra!" });
+        return req.status(400).json({ 
+            "success": false, 
+            "message": "Có lỗi xảy ra!" 
+        });
     }
 }
 

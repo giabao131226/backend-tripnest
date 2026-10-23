@@ -218,13 +218,13 @@ module.exports.myVoucher = async (req, res) => {
             limitItems: 8
         }
         pagination(req.query, objectPagination)
-        const countProduct = await VoucherUser.countDocuments({"user_id": user._id});
+        const countProduct = await VoucherUser.countDocuments({ "user_id": user._id });
         const totalPage = Math.ceil(countProduct / objectPagination.limitItems)
         objectPagination.totalPage = totalPage
         //End Pagination
 
-        const userVoucher = await VoucherUser.find({ 
-            "user_id": user._id 
+        const userVoucher = await VoucherUser.find({
+            "user_id": user._id
         }).limit(objectPagination.limitItems);
         const myVouchers = await Promise.all(userVoucher.map(async (item) => {
             const voucherDetail = await Voucher.findOne({
@@ -242,6 +242,40 @@ module.exports.myVoucher = async (req, res) => {
 
     } catch (ex) {
         console.log("Lỗi tại controller voucher.myVouchers: " + ex);
+        return res.status(400).json({
+            "success": false,
+            "message": "Có lỗi xảy ra!"
+        })
+    }
+}
+
+// [GET] "/vouchers/my-voucher/all"
+module.exports.getAllMyVoucher = async (req, res) => {
+    try {
+        const user = req.user;
+        const userVoucher = await VoucherUser.find({
+            "user_id": user._id
+        });
+        const myVouchers = await Promise.all(userVoucher.map(async (item) => {
+            const voucherDetail = await Voucher.findOne({
+                "_id": item.voucher_id,
+                "start_date": {
+                    $lte: new Date()
+                },
+                "end_date": {
+                    $gt: new Date()
+                }
+            }).lean();
+            return voucherDetail;
+        }))
+
+        return res.status(200).json({
+            "success": true,
+            "vouchers": myVouchers
+        })
+
+    } catch (ex) {
+        console.log("Lỗi tại controller voucher.getAllMyVoucher: " + ex);
         return res.status(400).json({
             "success": false,
             "message": "Có lỗi xảy ra!"

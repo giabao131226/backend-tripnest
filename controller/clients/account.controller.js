@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken")
 const Account = require("../../models/account.model")
 const validate = require("../../helpers/validate.helper")
+const UpgradeRequest = require("../../models/upgrade-request.model");
 
 module.exports.signUp = async (req,res) => {
     const payload = {
@@ -110,18 +111,76 @@ module.exports.logOut = (req,res) => {
     return res.json({"success": true});
 }
 
-// [PATCH] "/account/update-account/:id"
+// [PATCH] "/account/edit/:id"
 module.exports.updateAccount = async (req,res) => {
     try{
-        console.log(req.body);
         const id = req.params.id;
         // validate
         // end validate
+        const data = req.body;
+        console.log("data update: ",data);
 
         const result = await Account.updateOne({"_id": id},{...req.body});
-        return res.json({"success": true,"newInfo": req.body});
+        return res.json({
+            "success": true,
+            "newInfo": req.body
+        });
     }catch(ex){
         console.log("Có lỗi khi cập nhật thông tin tài khoản: "+ex);
-        return res.json({"success": false});
+        return res.status(400).json({
+            "success": false,
+            "message": "Có lỗi xảy ra"
+        });
+    }
+}
+
+// [PATCH] "/account/request-upgrade-role"
+module.exports.requestUpgradeRole = async (req,res) => {
+    try{
+        const data = req.body;
+       
+        const result = await UpgradeRequest.create(data);
+        console.log(result);
+
+        if(!result) throw new Error();
+
+        return res.status(200).json({
+            "success": true,
+            "message": "Yêu cầu nâng cấp đã được gửi, yêu cầu sẽ được duyệt trong vòng 3 ngày"
+        })
+    }catch(ex){
+        console.log("Có lỗi tại controller account.requestUpgradeRole: "+ex);
+        return res.status(400).json({
+            "success": false,
+            "message": "Có lỗi xảy ra"
+        });
+    }
+}
+
+// [GET] "/account/send-request-upgrade"
+module.exports.sendRequestUpgrade = async (req,res) => {
+    try{
+        const user = req.user;
+        const dnow = new Date();
+        const haveRequest = await UpgradeRequest.findOne({
+            "account_id": user._id,
+            "createdAt": {
+                $lte: dnow
+            },
+            "createdAt": {
+                $gte: (dnow - 3 * 24 * 60 * 60 * 1000)
+            }
+        })
+
+        return res.status(200).json({
+            "success": true,
+            "sendRequestUpgrade": haveRequest === null ? false : true
+        });
+    }catch(ex){
+        console.log("Có lỗi tại controller account.sendRequestUpgrade: "+ex);
+        return res.status(400).json({
+            "success": false,
+            "message": "Có lỗi xảy ra"
+        })
     }
 }

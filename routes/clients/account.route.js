@@ -1,10 +1,10 @@
-
 const express = require("express")
 const router = express.Router();
 const controller = require("../../controller/clients/account.controller")
 const cloudinary = require("cloudinary");
 const multer = require("multer");
 const upload = multer({"dest": "uploads/"});
+const authMiddleWare = require("../../middleware/auth.middleware");
 
 cloudinary.config({
     cloud_name: "dnlcvjrnb",
@@ -16,7 +16,7 @@ router.get("/auth",controller.getInfo)
 router.post("/sign-in",controller.signIn)
 router.post("/sign-up",controller.signUp)
 router.post("/logout",controller.logOut)
-router.patch("/update-account/:id",upload.fields([
+router.patch("/edit/:id",upload.fields([
     {name: "avatar",maxCount: 1},
     {name: "business_lisence",maxCount:1}
 ]),
@@ -39,5 +39,7 @@ router.patch("/update-account/:id",upload.fields([
         }
     }
 ,controller.updateAccount);
+router.patch("/request-upgrade-role",controller.requestUpgradeRole);
+router.get("/send-request-upgrade",authMiddleWare.auth,controller.sendRequestUpgrade);
 
 module.exports = router;
