@@ -115,8 +115,6 @@ module.exports.logOut = (req,res) => {
 module.exports.updateAccount = async (req,res) => {
     try{
         const id = req.params.id;
-        // validate
-        // end validate
         const data = req.body;
         console.log("data update: ",data);
 

@@ -18,7 +18,9 @@ router.post("/sign-up",controller.signUp)
 router.post("/logout",controller.logOut)
 router.patch("/edit/:id",upload.fields([
     {name: "avatar",maxCount: 1},
-    {name: "business_lisence",maxCount:1}
+    {name: "business_lisence",maxCount:1},
+    {name: "id_card_front",maxCount: 1},
+    {name: "id_card_back",maxCount: 1}
 ]),
     async (req,res,next) => {
         try{
@@ -30,6 +32,14 @@ router.patch("/edit/:id",upload.fields([
                 if(req.files.business_lisence){
                     const result = await cloudinary.uploader.upload(req.files.business_lisence[0].path);
                     req.body.business_lisence = result.secure_url;
+                }
+                if(req.files.id_card_front){
+                    const result = await cloudinary.uploader.upload(req.files.id_card_front[0].path);
+                    req.body.id_card_front = result.secure_url;
+                }
+                if(req.files.id_card_back){
+                    const result = await cloudinary.uploader.upload(req.files.id_card_back[0].path);
+                    req.body.id_card_back = result.secure_url;
                 }
             }
             next();
