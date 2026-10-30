@@ -3,10 +3,10 @@ const mongoose = require("mongoose");
 
 const upgradeRequestSchema = new mongoose.Schema({
     account_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Account",
-    required: true,
-    index: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Account",
+        required: true,
+        index: true
     },
     business_lisence: {
         type: String,

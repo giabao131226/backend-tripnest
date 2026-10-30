@@ -160,15 +160,21 @@ module.exports.sendRequestUpgrade = async (req,res) => {
     try{
         const user = req.user;
         const dnow = new Date();
-        const haveRequest = await UpgradeRequest.findOne({
-            "account_id": user._id,
-            "createdAt": {
-                $lte: dnow
-            },
-            "createdAt": {
-                $gte: (dnow - 3 * 24 * 60 * 60 * 1000)
-            }
-        })
+        let haveRequest = null;
+        if(user.role !== "owner"){
+            haveRequest = await UpgradeRequest.findOne({
+                "account_id": user._id,
+                "createdAt": {
+                    $lte: dnow
+                },
+                "createdAt": {
+                    $gte: (dnow - 3 * 24 * 60 * 60 * 1000)
+                },
+                "status": {
+                    $in: ["pending"]
+                }
+            })
+        }
 
         return res.status(200).json({
             "success": true,
